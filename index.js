@@ -17,10 +17,14 @@ app.get('/personagens', (req, res) => {
 })
 
 app.get('/personagens/:id', (req, res) => {
-  const id = req.params.id
-    
+  const id = Number(req.params.id)
+
+  if (!Number.isInteger(id) || id < 1 || id > lista.length) {
+    return res.status(404).send({ error: 'Personagem não encontrado' })
+  }
+
   const personagem = lista[id - 1]
-    
+
   res.send(personagem)
 })
 
@@ -29,27 +33,45 @@ app.use(express.json())
 
 app.post('/personagens', (req, res) => {
   const novoPersonagem = req.body.nome
-  
-  lista.push(novoPersonagem)
 
-  res.send("Personagem adicionado com sucesso: " + novoPersonagem)
+  if (!novoPersonagem || typeof novoPersonagem !== 'string' || novoPersonagem.trim() === '') {
+    return res.status(400).send({ error: 'Nome inválido' })
+  }
+
+  const nomeTrim = novoPersonagem.trim()
+  lista.push(nomeTrim)
+
+  res.status(201).send({ message: 'Personagem adicionado com sucesso', nome: nomeTrim })
 })
 
 app.put('/personagens/:id', (req, res) => {
-  const id = req.params.id
+  const id = Number(req.params.id)
   const nomeAtualizado = req.body.nome
 
-  lista[id - 1] = nomeAtualizado
+  if (!Number.isInteger(id) || id < 1 || id > lista.length) {
+    return res.status(404).send({ error: 'Personagem não encontrado' })
+  }
 
-  res.send("Personagem atualizado com sucesso: " + nomeAtualizado)
+  if (!nomeAtualizado || typeof nomeAtualizado !== 'string' || nomeAtualizado.trim() === '') {
+    return res.status(400).send({ error: 'Nome inválido' })
+  }
+
+  const nomeTrim = nomeAtualizado.trim()
+  lista[id - 1] = nomeTrim
+
+  res.send({ message: 'Personagem atualizado com sucesso', nome: nomeTrim })
 })
 
 app.delete('/personagens/:id', (req, res) => {
-  const id = req.params.id
+  const id = Number(req.params.id)
 
-  lista.splice(id - 1, 1)
+  if (!Number.isInteger(id) || id < 1 || id > lista.length) {
+    return res.status(404).send({ error: 'Personagem não encontrado' })
+  }
 
-  res.send("Personagem removido com sucesso!")
+  const removed = lista.splice(id - 1, 1)
+
+  res.send({ message: 'Personagem removido com sucesso!', removed: removed[0] })
 })
 
 app.listen(3000, () => { //iniciando o servidor
