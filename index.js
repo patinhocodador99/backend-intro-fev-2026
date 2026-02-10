@@ -35,6 +35,15 @@ app.post('/personagens', (req, res) => {
   res.send("Personagem adicionado com sucesso: " + novoPersonagem)
 })
 
+app.put('/personagens/:id', (req, res) => {
+  const id = req.params.id
+  const nomeAtualizado = req.body.nome
+
+  lista[id - 1] = nomeAtualizado
+
+  res.send("Personagem atualizado com sucesso: " + nomeAtualizado)
+})
+
 app.listen(3000, () => { //iniciando o servidor
   console.log('Server is running on http://localhost:3000')
 })
